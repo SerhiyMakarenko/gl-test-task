@@ -1,7 +1,7 @@
 ---
 - name: Install kvm, QEMU, libvirt and HAproxy
   hosts: hypervisor
-  remote_user: serhiy_makarenko
+  remote_user: some_user
   become_user: root
   become_method: sudo
 

@@ -1,5 +1,2 @@
 [hypervisor]
 srv1.example.com
-
-[balancer]
-srv1.example.com
