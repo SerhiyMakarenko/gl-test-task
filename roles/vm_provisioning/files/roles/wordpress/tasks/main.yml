@@ -1,0 +1,103 @@
+---
+- name: Installing WP-CLI
+  get_url:
+    url: "{{ wp_cli_url }}"
+    dest: "{{ wp_cli_bin }}"
+    mode: 0755
+  become: yes
+
+- name: Installing curl, php-pgsql, wordpress and unzip
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - curl
+    - php-pgsql
+    - wordpress
+    - unzip
+  notify:
+    - restart_apache2
+  become: yes
+
+- name: Downloading and unzip PG4WP plugin
+  unarchive:
+    src: https://github.com/kevinoid/postgresql-for-wordpress/archive/wordpress4-compat.zip
+    dest: /usr/share/wordpress/wp-content/plugins
+    remote_src: yes
+  become: yes
+
+- name: Moving unarchived files to the plugin directory
+  command: cp -rf /usr/share/wordpress/wp-content/plugins/postgresql-for-wordpress-wordpress4-compat/pg4wp /usr/share/wordpress/wp-content/plugins/
+  become: yes
+
+- name: Cleaning up empty folders
+  file:
+    path: /usr/share/wordpress/wp-content/plugins/postgresql-for-wordpress-wordpress4-compat
+    state: absent
+  become: yes
+
+- name: Copying db.php to the wp-content folder
+  command: cp /usr/share/wordpress/wp-content/plugins/pg4wp/db.php /usr/share/wordpress/wp-content/
+  become: yes
+
+- name: Fetching random salts for WordPress config
+  command: curl http://api.wordpress.org/secret-key/1.1/salt/
+  register: wp_salt
+  become: yes
+
+- name: Adding WordPress config file
+  template:
+    src: wp-config.php.2j
+    dest: "{{ wp_root }}/wp-config.php"
+  become: yes
+
+- name: Creating folder for PG4WP plugin in Wordpress web root
+  file:
+    path: /var/lib/wordpress/wp-content/plugins/pg4wp
+    state: directory
+    recurse: yes
+  become: yes
+
+- name: Creating necessary symlinks
+  file: 
+    src: "/usr/share/wordpress/{{ item }}"
+    dest: "/var/lib/wordpress/{{ item }}"
+    state: link
+    owner: www-data
+    group: www-data
+  with_items:
+    - wp-content/db.php
+    - wp-content/plugins/pg4wp/core.php
+    - wp-content/plugins/pg4wp/db.php
+    - wp-content/plugins/pg4wp/driver_mysql.php
+    - wp-content/plugins/pg4wp/driver_pgsql_install.php
+    - wp-content/plugins/pg4wp/driver_pgsql.php
+    - wp-config.php
+  become: yes
+
+- name: Installing WordPress tables
+  command: wp core install
+    --url=192.168.211.2
+    --title={{ site_name }}
+    --admin_user={{ wp_admin_user }}
+    --admin_password={{ wp_admin_password }}
+    --admin_email={{ wp_admin_email }}
+    --path={{ wp_root }}
+    --allow-root
+    chdir={{ wp_root }}
+  become: yes
+  when: inventory_hostname == "192.168.211.2"
+
+- name: Installing WordPress tables
+  command: wp core install
+    --url=192.168.211.3
+    --title={{ site_name }}
+    --admin_user={{ wp_admin_user }}
+    --admin_password={{ wp_admin_password }}
+    --admin_email={{ wp_admin_email }}
+    --path={{ wp_root }}
+    --allow-root
+    chdir={{ wp_root }}
+  become: yes
+  when: inventory_hostname == "192.168.211.3"

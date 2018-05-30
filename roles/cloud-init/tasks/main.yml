@@ -1,0 +1,44 @@
+---
+- name: Create directory for cloud-init config files vm-1
+  file:
+    path: "{{ cloud_init_config_vm_1 }}"
+    state: directory
+    recurse: yes
+  become: yes
+
+- name: Create directory for cloud-init config files vm-2
+  file:
+    path: "{{ cloud_init_config_vm_2 }}"
+    state: directory
+    recurse: yes
+  become: yes
+
+- name: Copy the user-data file for cloud-init
+  copy:
+    src: user-data
+    dest: /tmp/cloud-init/
+  become: yes
+
+- name: Copy the meta-data file for cloud-init on vm-1
+  copy:
+    src: vm-1/meta-data
+    dest: "{{ cloud_init_config_vm_1 }}/"
+  become: yes
+
+- name: Copy the meta-data file for cloud-init on vm-2
+  copy:
+    src: vm-2/meta-data
+    dest: "{{ cloud_init_config_vm_2 }}/"
+  become: yes
+
+- name: Copy the network-config file for cloud-init on vm-1
+  template:
+    src: vm-1/network-config.j2
+    dest: "{{ cloud_init_config_vm_1 }}/network-config"
+  become: yes
+
+- name: Copy the network-config file for cloud-init on vm-2
+  template:
+    src: vm-2/network-config.j2
+    dest: "{{ cloud_init_config_vm_2 }}/network-config"
+  become: yes

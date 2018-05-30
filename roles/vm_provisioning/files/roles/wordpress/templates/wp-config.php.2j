@@ -1,0 +1,18 @@
+<?php
+	define("DB_NAME", "{{ dbname }}");
+	define("DB_USER", "{{ dbuser }}");
+	define("DB_PASSWORD", "{{ dbpassword }}");
+	define("DB_HOST", "localhost");
+	define("WP_CONTENT_DIR", "/var/lib/wordpress/wp-content");
+	
+	{{ wp_salt.stdout }}
+	
+	$table_prefix  = "{{ wp_table_prefix }}";
+	
+	define("WPLANG", "{{ wp_lang }}");
+	
+	if (!defined("ABSPATH"))
+		define("ABSPATH", dirname(__FILE__) . "/");
+
+	require_once(ABSPATH . "wp-settings.php");
+?>

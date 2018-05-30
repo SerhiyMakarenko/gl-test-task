@@ -1,0 +1,19 @@
+#cloud-config
+
+groups:
+  - cloud-users
+
+users:
+  - default
+  - name: serhiy
+    lock_passwd: False
+    passwd: $6$rounds=4096$SkLS4MSr6$Lp6dEX458tZYcDXtIZQs3kZg/nyj9..vBtVM0pQCi7VqjMdoa1fC1HQ/RFF3oXB8X/Wk5/vvieMgb0YKjC6uK1 #i.e. debian
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    gecos: Serhiy Makarenko
+    shell: /bin/bash
+    primary-group: cloud-users
+    groups: users, admin
+    ssh_authorized_keys:
+    - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCk8kwR+XyNsNgCK5E9dM26q08g49RNnEdVKUDuIot/+exRrLQcRIwx1jkjv1WpwkC1wkawYVCDjB+nHwxG9HAL2I90lfHuAru4o74RMnm/1AUtVsXXHfl4uwrp3TnvrTYJPYv0k5xD808Q1wjnG8keo7hZVGdOKWQiS4HeRmVtxpE38QZJe480ilMXZAXKDTayiJ6SwZl+dx5+xrdsuP61mY3PQ65ElJU1yVcu2yY0sevs9MQtpDMEGhech5L76yi/F1KqiewiRmBDv41CiElFwerNaiAHoA1g/hZqDlXL/+dNYbJjm1Yvnx6I0zIDmJ0wj5VR/9a5p5ebnI1GZloP serhiy_makarenko@mac-pro-serhiya-makarenka.local
+
+package_upgrade: true

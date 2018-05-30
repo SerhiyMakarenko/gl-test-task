@@ -1,0 +1,30 @@
+---
+- name: Installing the required software
+  apt:
+    name: apache2
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: Copying Wordpress config to the apache2 folder
+  copy:
+    src: wp.conf
+    dest: /etc/apache2/sites-available/
+  become: yes
+
+- name: Disable default site
+  file:
+    path: /etc/apache2/sites-enabled/000-default.conf
+    state: absent
+  notify:
+    - restart_apache2
+  become: yes
+
+- name: Enable Wordpress site
+  file: 
+    src: /etc/apache2/sites-available/wp.conf
+    dest: /etc/apache2/sites-enabled/wp.conf
+    state: link
+  notify:
+    - restart_apache2
+  become: yes

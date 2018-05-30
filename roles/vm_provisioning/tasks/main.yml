@@ -1,0 +1,118 @@
+---
+- name: Installing Ansible and sshpass
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - ansible
+    - sshpass
+  become: yes
+
+- name: Creating directory for vm provisioning
+  file:
+    path: "{{ vm_provisioning_config }}{{ item }}"
+    state: directory
+    recurse: yes
+  with_items:
+    - /group_vars
+    - /roles/apache2/files
+    - /roles/apache2/handlers
+    - /roles/apache2/tasks
+    - /roles/postgresql/tasks
+    - /roles/wordpress/tasks
+    - /roles/wordpress/templates
+    - /roles/iptables/tasks
+    - /roles/iptables/files
+  become: yes
+
+- name: Copying main files for playbook
+  copy:
+    src: "{{ item }}"
+    dest: "{{ vm_provisioning_config }}/{{ item }}"
+  with_items:
+    - hosts
+    - site.yml
+  become: yes
+
+- name: Copying var file for playbook
+  copy:
+    src: group_vars/main.yml
+    dest: "{{ vm_provisioning_config }}/group_vars"
+  become: yes
+
+- name: Copying files for apache2 role
+  copy:
+    src: roles/apache2/files/wp.conf
+    dest: "{{ vm_provisioning_config }}/roles/apache2/files"
+  become: yes
+
+- name: Copying handlers for apache2 role
+  copy:
+    src: roles/apache2/handlers/main.yml
+    dest: "{{ vm_provisioning_config }}/roles/apache2/handlers"
+  become: yes
+
+- name: Copying tasks for apache2 role
+  copy:
+    src: roles/apache2/tasks/main.yml
+    dest: "{{ vm_provisioning_config }}/roles/apache2/tasks"
+  become: yes
+
+- name: Copying tasks for PostgresQL role
+  copy:
+    src: roles/postgresql/tasks/main.yml
+    dest: "{{ vm_provisioning_config }}/roles/postgresql/tasks"
+  become: yes
+
+- name: Copying tasks for Wordpress role
+  copy:
+    src: roles/wordpress/tasks/main.yml
+    dest: "{{ vm_provisioning_config }}/roles/wordpress/tasks"
+  become: yes
+
+- name: Copying handlers for Wordpress role
+  copy:
+    src: roles/wordpress/handlers/main.yml
+    dest: "{{ vm_provisioning_config }}/roles/wordpress/handlers"
+  become: yes
+
+- name: Copying templates for Wordpress role
+  copy:
+    src: roles/wordpress/templates/wp-config.php.2j
+    dest: "{{ vm_provisioning_config }}/roles/wordpress/templates"
+  become: yes
+
+- name: Copying files for iptables role
+  copy:
+    src: roles/iptables/files/iptables.conf
+    dest: "{{ vm_provisioning_config }}/roles/iptables/files"
+  become: yes
+
+- name: Copying tasks for iptables role
+  copy:
+    src: roles/iptables/tasks/main.yml
+    dest: "{{ vm_provisioning_config }}/roles/iptables/tasks"
+  become: yes
+
+- name: Disabling host key checking
+  lineinfile:
+    path: /etc/ansible/ansible.cfg
+    regexp: '^#host_key_checking = False'
+    line: 'host_key_checking = False'
+    backrefs: yes
+  ignore_errors: yes
+  become: yes
+
+- name: Waiting when VM's complite booting
+  wait_for:
+    host: "{{ item }}"
+    port: 22
+    state: started
+  with_items:
+    - "{{ vm_1_ip }}"
+    - "{{ vm_2_ip }}"
+
+- name: Seting up VM's
+  shell: ansible-playbook -i /tmp/vm_provisioning/hosts /tmp/vm_provisioning/site.yml
+  become: yes

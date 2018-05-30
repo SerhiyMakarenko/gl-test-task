@@ -1,0 +1,22 @@
+---
+#Installing the Software
+- name: Installing the required software
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - qemu-kvm
+    - libvirt0
+    - virt-manager
+    - libguestfs-tools
+  notify:
+    - enable_libvirtd
+  become: yes
+
+- name: Downloading debian cloud image for templates
+  get_url:
+    url: https://cdimage.debian.org/cdimage/openstack/current/debian-9.4.5-20180513-openstack-amd64.qcow2
+    dest: /var/lib/libvirt/images/debian-9.4.5-20180513-openstack-amd64.qcow2
+  register: cloudimage
+  become: yes

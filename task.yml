@@ -1,0 +1,17 @@
+---
+- name: Install kvm, QEMU, libvirt and HAproxy
+  hosts: hypervisor
+  remote_user: serhiy_makarenko
+  become_user: root
+  become_method: sudo
+
+  vars_files:
+    - group_vars/main.yml
+
+  roles:
+    - cloud-init
+    - software_install
+    - create_net
+    - create_vm
+    - vm_provisioning
+    - haproxy_install

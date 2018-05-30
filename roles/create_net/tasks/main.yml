@@ -1,0 +1,41 @@
+---
+- name: Create directory for config files
+  file:
+    path: "{{ net_config }}"
+    state: directory
+    recurse: yes
+  become: yes
+
+- name: Copy net config
+  template:
+    src: gl-homework-net.xml.j2
+    dest: "{{ net_config }}/gl-homework-net.xml"
+  become: yes
+
+- name: Create virtual network for vm's
+  shell: virsh net-create {{ net_config }}/gl-homework-net.xml
+  ignore_errors: yes
+  when: cloudimage.changed
+  become: yes
+
+#- name: Enable NAT on the host machine
+#  become: yes
+#  shell: echo {{ item }} >> /etc/sysctl.conf; sysctl -p
+#  with_items:
+#  - net.ipv4.ip_forward=1
+#  - net.ipv4.conf.all.forwarding=1
+#  ignore_errors: yes
+
+- name: Enable NAT on the host machine
+  lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^#net.ipv4.ip_forward=1'
+    line: 'net.ipv4.ip_forward=1'
+    backrefs: yes
+  ignore_errors: yes
+  become: yes
+
+- name: Reload kernel parameters
+  shell: sysctl -p
+  when: cloudimage.changed
+  become: yes

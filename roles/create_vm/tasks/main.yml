@@ -1,0 +1,29 @@
+---
+#Create Virtual Machine
+
+- name: Create virtual machine from template file
+  shell: qemu-img create -f qcow2 -b /var/lib/libvirt/images/debian-9.4.5-20180513-openstack-amd64.qcow2 /var/lib/libvirt/images/debian9-test-{{ item }}.qcow2 20G
+  with_items:
+    - vm-1
+    - vm-2
+  ignore_errors: yes
+  when: cloudimage.changed
+  become: yes
+
+- name: Create cd for no network cloud-init provisioning
+  shell: genisoimage -output /var/lib/libvirt/images/seed-{{ item }}.iso -volid cidata -joliet -rock /tmp/cloud-init/user-data /tmp/cloud-init/{{ item }}/meta-data /tmp/cloud-init/{{ item }}/network-config
+  with_items:
+    - vm-1
+    - vm-2
+  ignore_errors: yes
+  when: cloudimage.changed
+  become: yes
+
+- name: Boot vm's
+  shell: virt-install --ram {{ memory_size }} --vcpus {{ cpu_count }} --os-variant debian9 --disk path=/var/lib/libvirt/images/debian9-test-{{ item }}.qcow2,device=disk,bus=virtio,format=qcow2 --disk /var/lib/libvirt/images/seed-{{ item }}.iso,device=cdrom --import --noautoconsole --vnc --bridge {{ bridge_name }} --name test-debian-{{ item }}
+  with_items:
+    - vm-1
+    - vm-2
+  ignore_errors: yes
+  when: cloudimage.changed
+  become: yes

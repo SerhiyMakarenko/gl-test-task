@@ -1,0 +1,15 @@
+---
+- name: Installing HAProxy
+  apt:
+    name: haproxy
+    state: latest
+    update_cache: yes
+  become: yes
+
+- name: Updating HAProxy config
+  template:
+    src: templates/haproxy.cfg.2j
+    dest: /etc/haproxy/haproxy.cfg
+  notify:
+    - restart_haproxy
+  become: yes

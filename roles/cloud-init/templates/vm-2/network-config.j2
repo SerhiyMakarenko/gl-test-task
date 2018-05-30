@@ -1,0 +1,9 @@
+version: 1
+config:
+  - type: physical
+    name: eth0
+    subnets:
+      - type: static
+        address: {{ vm_2_ip }}
+        netmask: {{ vm_net_mask }}
+        gateway: {{ gw }}

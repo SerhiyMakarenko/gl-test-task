@@ -1,0 +1,22 @@
+---
+- name: Copy the iptables.conf file for iptables setup
+  copy:
+    src: iptables.conf
+    dest: /etc/
+  become: yes
+
+- name: Securing host with iptables
+  shell: iptables-restore < /etc/iptables.conf
+  become: yes
+
+- name: Adding repo with security updates
+  apt_repository:
+    repo: deb http://security.debian.org/debian-security stretch/updates main contrib non-free
+    state: present
+  become: true
+
+- name: Updating and upgrading packages
+  apt:
+    upgrade: yes
+    update_cache: yes
+  become: true

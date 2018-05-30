@@ -1,0 +1,31 @@
+---
+# Vars for hypervisor provisioning
+
+## Vars for VM provisioning
+memory_size: "2048"
+cpu_count: "2"
+bridge_interface: "eth1"
+bridge_name: "br0"
+cloud_init_config_vm_1: "/tmp/cloud-init/vm-1"
+cloud_init_config_vm_2: "/tmp/cloud-init/vm-2"
+
+## Vars for VM net
+net_config: "/tmp/virsh-net-conf"
+vm_1_ip: "192.168.211.2"
+vm_2_ip: "192.168.211.3"
+vm_net_mask: "255.255.255.248"
+gw: "192.168.211.1"
+net_mask: "255.255.255.248"
+dhcp_start: "192.168.211.2"
+dhcp_end: "192.168.211.6"
+
+## Vars for VM provisioning
+vm_provisioning_config: "/tmp/vm_provisioning"
+
+## Vars for HAproxy configuration
+haproxy_app_name: "gl-homework"
+haproxy_mode: "http"
+haproxy_algorithm: "roundrobin"
+haproxy_backend_servers:
+  - { name: "server1", ip: "192.168.211.2", port: "80", paramstring: "check" }
+  - { name: "server2", ip: "192.168.211.3", port: "80", paramstring: "check" }

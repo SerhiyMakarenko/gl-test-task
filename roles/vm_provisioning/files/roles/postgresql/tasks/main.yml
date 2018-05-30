@@ -1,0 +1,51 @@
+---
+- name: Installing postgresql, postgresql-client python-psycopg2
+  apt:
+    name: "{{ item }}"
+    state: latest
+    update_cache: yes
+  with_items:
+    - postgresql
+    - postgresql-client
+    - python-psycopg2
+  become: yes
+
+- name: Create DB for Wordpress
+  postgresql_db:
+    name: "{{ dbname }}"
+  become: yes
+  become_user: postgres
+  vars:
+    ansible_ssh_pipelining: true
+
+- name: Grant access to the DB for Wordpress user
+  postgresql_user:
+    db: "{{ dbname }}"
+    name: "{{ dbuser }}"
+    password: "{{ dbpassword }}"
+    priv: ALL
+  become: yes
+  become_user: postgres
+  vars:
+    ansible_ssh_pipelining: true
+
+- name: Securing Wordpress PostgresQL user
+  postgresql_user:
+    name: "{{ dbuser }}"
+    role_attr_flags: NOSUPERUSER,NOCREATEDB
+  become: yes
+  become_user: postgres
+  vars:
+    ansible_ssh_pipelining: true
+  
+- name: Securing Wordpress database
+  postgresql_privs:
+    db: "{{ dbname }}"
+    role: PUBLIC
+    type: database
+    priv: ALL
+    state: absent
+  become: yes
+  become_user: postgres
+  vars:
+    ansible_ssh_pipelining: true

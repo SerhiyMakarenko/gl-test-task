@@ -1,0 +1,14 @@
+<network>
+  <name>gl-homework-net</name>
+  <forward dev='{{ bridge_interface }}' mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='{{ bridge_name }}' stp='on' delay='0'/>
+  <ip address='{{ gw }}' netmask='{{ net_mask }}'>
+    <dhcp>
+      <range start='{{ dhcp_start }}' end='{{ dhcp_end }}'/>
+    </dhcp>
+  </ip>
+</network>
