@@ -20,7 +20,7 @@ List of subtasks that should be implemented with the code in this repo:
 7. Place HAproxy or any other balancer in front of the VM's and setup balancing of HTTP traffic between two instances
 8. Update security packages inside instances and setup firewall (with iptables)
 9. Pull the code to the GitHub/GitLab for the review
-10. Install an setup Jenkins, create the pipeline which will be pulling out the ansible code from GitHub/GitLab and run automatically by schedule
+10. Install and setup Jenkins, create the pipeline which will be pulling out the ansible code from GitHub/GitLab and run automatically by schedule
 
 ## Limitations and additional info
 The following limitation and requirements should be taken into account in solving this task:
